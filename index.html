@@ -306,21 +306,6 @@
           background-color 0.3s ease;
       }
 
-      /* BARU: SUB-CONTAINER INPUT BERPASANGAN UNTUK STRUKTUR (HARGA + FEE %) */
-      .paired-input-container {
-        display: flex;
-        gap: 8px;
-        width: 100%;
-      }
-
-      .paired-input-container input:first-child {
-        flex: 2; /* Kolom Harga mengambil ruang lebih luas */
-      }
-
-      .paired-input-container input:last-child {
-        flex: 1; /* Kolom Fee (%) lebih kecil ringkas */
-      }
-
       .field input:hover,
       .field select:hover {
         border-color: #94a3b8;
@@ -423,7 +408,7 @@
         color: var(--color-loss);
       }
 
-      /* Grid Pop-up Desktop & HP */
+      /* Grid Pop-up Desktop & HP (2 Kolom Sejajar) */
       .result-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -434,12 +419,12 @@
         background-color: var(--card-bg);
         border: 1px solid var(--input-border);
         border-radius: 12px;
-        padding: 16px 20px;
+        padding: 18px 20px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        gap: 10px;
-        transition: background-color 0.2s ease;
+        justify-content: flex-start;
+        gap: 8px;
+        transition: border-color 0.2s ease;
       }
 
       .result-box:hover {
@@ -459,6 +444,15 @@
         font-weight: 700;
         color: var(--text-main);
         font-variant-numeric: tabular-nums;
+      }
+
+      /* Gaya teks baru untuk sub-informasi fee/pajak yang disisipkan */
+      .result-sub-info {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-ghost);
+        margin-top: 2px;
+        line-height: 1.4;
       }
 
       .result-val.green {
@@ -673,7 +667,6 @@
           margin-bottom: 2.5rem;
         }
 
-        /* FIX ABSOLUT: 2 KOLOM SEJAJAR ANTI-LETAK BOCOR DI HP */
         .row,
         .row3 {
           display: grid !important;
@@ -715,7 +708,11 @@
         }
 
         .result-val {
-          font-size: 15px;
+          font-size: 14.5px;
+        }
+
+        .result-sub-info {
+          font-size: 10.5px;
         }
 
         /* DI HP, BOKS TRANSAKSI TETAP MENYAMPING SECARA KONSISTEN */
@@ -786,47 +783,51 @@
                 oninput="calcPL()"
               />
             </div>
-
             <div class="field">
-              <label id="pl-buylabel">Harga Beli & Fee Beli (%)</label>
-              <div class="paired-input-container">
-                <input
-                  type="number"
-                  id="pl-buy"
-                  value=""
-                  placeholder="Harga"
-                  oninput="calcPL()"
-                />
-                <input
-                  type="number"
-                  id="pl-feebuy"
-                  value=""
-                  placeholder="Fee %"
-                  step="0.01"
-                  oninput="calcPL()"
-                />
-              </div>
+              <label id="pl-buylabel" for="pl-buy"
+                >Harga beli per lembar (Rp)</label
+              >
+              <input
+                type="number"
+                id="pl-buy"
+                value=""
+                placeholder="Contoh: 5000"
+                oninput="calcPL()"
+              />
             </div>
-
             <div class="field">
-              <label id="pl-selllabel">Harga Jual & Fee Jual (%)</label>
-              <div class="paired-input-container">
-                <input
-                  type="number"
-                  id="pl-sell"
-                  value=""
-                  placeholder="Harga"
-                  oninput="calcPL()"
-                />
-                <input
-                  type="number"
-                  id="pl-feesell"
-                  value=""
-                  placeholder="Fee %"
-                  step="0.01"
-                  oninput="calcPL()"
-                />
-              </div>
+              <label id="pl-selllabel" for="pl-sell"
+                >Harga jual per lembar (Rp)</label
+              >
+              <input
+                type="number"
+                id="pl-sell"
+                value=""
+                placeholder="Contoh: 6000"
+                oninput="calcPL()"
+              />
+            </div>
+            <div class="field">
+              <label for="pl-feebuy">Fee beli broker (%)</label>
+              <input
+                type="number"
+                id="pl-feebuy"
+                value=""
+                placeholder="Contoh: 0.15"
+                step="0.01"
+                oninput="calcPL()"
+              />
+            </div>
+            <div class="field">
+              <label for="pl-feesell">Fee jual broker (%)</label>
+              <input
+                type="number"
+                id="pl-feesell"
+                value=""
+                placeholder="Contoh: 0.25"
+                step="0.01"
+                oninput="calcPL()"
+              />
             </div>
           </div>
           <div class="hint" id="pl-hint">
@@ -910,29 +911,31 @@
                 oninput="calcBEP()"
               />
             </div>
-
             <div class="field">
-              <label id="bep-buy-label">Harga Beli & Fee Beli (%)</label>
-              <div class="paired-input-container">
-                <input
-                  type="number"
-                  id="bep-buy"
-                  value=""
-                  placeholder="Harga"
-                  oninput="calcBEP()"
-                />
-                <input
-                  type="number"
-                  id="bep-feebuy"
-                  value=""
-                  placeholder="Fee %"
-                  step="0.01"
-                  oninput="calcBEP()"
-                />
-              </div>
+              <label id="bep-buy-label" for="bep-buy"
+                >Harga beli per lembar (Rp)</label
+              >
+              <input
+                type="number"
+                id="bep-buy"
+                value=""
+                placeholder="Contoh: 5000"
+                oninput="calcBEP()"
+              />
             </div>
             <div class="field">
-              <label>Fee Jual Broker (%)</label>
+              <label for="bep-feebuy">Fee beli (%)</label>
+              <input
+                type="number"
+                id="bep-feebuy"
+                value=""
+                placeholder="Contoh: 0.15"
+                step="0.01"
+                oninput="calcBEP()"
+              />
+            </div>
+            <div class="field">
+              <label for="bep-feesell">Fee jual (%)</label>
               <input
                 type="number"
                 id="bep-feesell"
@@ -1116,8 +1119,14 @@
         return (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
       }
 
-      function makeBox(label, val, cls) {
-        return `<div class="result-box"><div class="result-label">${label}</div><div class="result-val ${cls || ""}">${val}</div></div>`;
+      // Pembaruan struktur box cetakan boks hasil modal untuk menyisipkan sub-info
+      function makeBox(label, val, cls, subInfoHtml = "") {
+        return `
+    <div class="result-box">
+      <div class="result-label">${label}</div>
+      <div class="result-val ${cls || ""}">${val}</div>
+      ${subInfoHtml ? `<div class="result-sub-info">${subInfoHtml}</div>` : ""}
+    </div>`;
       }
 
       function saveFormFields(storageKey, fieldIds) {
@@ -1199,11 +1208,11 @@
           ? "Jumlah lot beli"
           : "Jumlah share beli";
         document.getElementById("pl-buylabel").textContent = isIDX
-          ? "Harga Beli & Fee Beli (%)"
-          : "Harga Beli & Fee Beli (%)";
+          ? "Harga beli per lembar (Rp)"
+          : "Harga beli per share ($)";
         document.getElementById("pl-selllabel").textContent = isIDX
-          ? "Harga Jual & Fee Jual (%)"
-          : "Harga Jual & Fee Jual (%)";
+          ? "Harga jual per lembar (Rp)"
+          : "Harga jual per share ($)";
         document.getElementById("pl-hint").textContent = isIDX
           ? "IDX: PPh final 0.1% sudah termasuk dalam perhitungan biaya jual."
           : "US: tidak ada PPh final per transaksi, pajak capital gain ditanggung investor.";
@@ -1238,18 +1247,30 @@
         const feeSellRp = shares * sellPrice * feeSell;
 
         const isProfit = pl >= 0;
+
+        // PELEBURAN HASIL: Menyisipkan data fee langsung ke boks data utamanya masing-masing
+        const buySubInfo = `Fee Beli: ${fmt(feeBuyRp, isIDX)}`;
+        const sellSubInfo = `Fee Jual: ${fmt(feeSellRp, isIDX)} ${isIDX ? `<br>PPh Final: ${rp(pph)}` : ""}`;
+
         const html =
-          makeBox("Total modal beli", fmt(totalBuy, isIDX), "blue") +
-          makeBox("Hasil jual (net)", fmt(totalSell, isIDX), "blue") +
+          makeBox(
+            "Total modal beli",
+            fmt(totalBuy, isIDX),
+            "blue",
+            buySubInfo,
+          ) +
+          makeBox(
+            "Hasil jual (net)",
+            fmt(totalSell, isIDX),
+            "blue",
+            sellSubInfo,
+          ) +
           makeBox(
             isProfit ? "Profit" : "Loss",
             fmt(pl, isIDX),
             isProfit ? "green" : "red",
           ) +
-          makeBox("Return", pct(plPct), isProfit ? "green" : "red") +
-          makeBox("Fee beli", fmt(feeBuyRp, isIDX), "") +
-          makeBox("Fee jual", fmt(feeSellRp, isIDX), "") +
-          (isIDX ? makeBox("PPh final (0.1%)", rp(pph), "") : "");
+          makeBox("Return", pct(plPct), isProfit ? "green" : "red");
 
         handlePopupDisplay(html, true);
       }
@@ -1296,13 +1317,11 @@
         const net = gross - tax;
         const divYield = price > 0 ? (dps / price) * 100 : 0;
 
+        // PELEBURAN HASIL: Menyisipkan potongan pajak ke dalam boks dividen kotor/bersih
+        const grossSubInfo = `Pajak (${isIDX ? "10%" : "30%"}): ${fmt(tax, isIDX)}`;
+
         const html =
-          makeBox("Dividen kotor", fmt(gross, isIDX), "blue") +
-          makeBox(
-            "Pajak (" + (isIDX ? "10%" : "30%") + ")",
-            fmt(tax, isIDX),
-            "red",
-          ) +
+          makeBox("Dividen kotor", fmt(gross, isIDX), "blue", grossSubInfo) +
           makeBox("Dividen bersih", fmt(net, isIDX), "green") +
           makeBox("Dividend yield", divYield.toFixed(2) + "%", "blue");
 
@@ -1322,8 +1341,8 @@
           ? "Jumlah lot beli"
           : "Jumlah share beli";
         document.getElementById("bep-buy-label").textContent = isIDX
-          ? "Harga Beli & Fee Beli (%)"
-          : "Harga Beli & Fee Beli (%)";
+          ? "Harga beli per lembar (Rp)"
+          : "Harga beli per share ($)";
 
         saveFormFields(STORAGE_KEYS.DATA_BEP, [
           "bep-market",
@@ -1349,21 +1368,20 @@
         const bep = totalBuy / (shares * (1 - feeSell - pphRate));
         const bepPct = buyPrice > 0 ? ((bep - buyPrice) / buyPrice) * 100 : 0;
 
+        const feeBuyRp = shares * buyPrice * feeBuy;
+        const buySubInfo = `Termasuk Fee Beli: ${fmt(feeBuyRp, isIDX)}`;
+        const bepSubInfo = isIDX
+          ? `Fraksi Terdekat: ${rp(Math.ceil(bep / 50) * 50)}`
+          : "";
+
         const html =
-          makeBox("Total modal", fmt(totalBuy, isIDX), "blue") +
-          makeBox("Harga BEP", fmt(bep, isIDX), "blue") +
+          makeBox("Total modal", fmt(totalBuy, isIDX), "blue", buySubInfo) +
+          makeBox("Harga BEP", fmt(bep, isIDX), "blue", bepSubInfo) +
           makeBox(
             "Selisih dari harga beli",
             pct(bepPct),
             bepPct >= 0 ? "" : "green",
-          ) +
-          (isIDX
-            ? makeBox(
-                "Harga BEP (dibulatkan)",
-                rp(Math.ceil(bep / 50) * 50) + " (fraksi terdekat)",
-                "",
-              )
-            : "");
+          );
 
         handlePopupDisplay(html, true);
       }
@@ -1397,27 +1415,21 @@
           bulan > 0 ? (Math.pow(1 + roi / 100, 12 / bulan) - 1) * 100 : 0;
         const isProfit = totalReturn >= 0;
 
+        // PELEBURAN HASIL: Meleburkan Capital gain dan kontribusi dividen ke dalam boks total return
+        const returnSubInfo = `Gain: Rp ${Math.round(nilai - modal).toLocaleString("id-ID")} <br> Dividen: Rp ${Math.round(div).toLocaleString("id-ID")}`;
+
         const html =
           makeBox(
             "Total return",
             "Rp " + Math.round(totalReturn).toLocaleString("id-ID"),
             isProfit ? "green" : "red",
+            returnSubInfo,
           ) +
           makeBox("ROI", pct(roi), isProfit ? "green" : "red") +
           makeBox(
             "ROI annualized",
             pct(annualized),
             isProfit ? "green" : "red",
-          ) +
-          makeBox(
-            "Capital gain",
-            "Rp " + Math.round(nilai - modal).toLocaleString("id-ID"),
-            nilai - modal >= 0 ? "green" : "red",
-          ) +
-          makeBox(
-            "Kontribusi dividen",
-            "Rp " + Math.round(div).toLocaleString("id-ID"),
-            "blue",
           );
 
         handlePopupDisplay(html, true);
@@ -1494,16 +1506,14 @@
         const avgPrice = totalShares > 0 ? totalCost / totalShares : 0;
         const lots = isIDX ? totalShares / 100 : totalShares;
 
+        const avgSubInfo = `Total Lembar: ${totalShares.toLocaleString("id-ID")}`;
+
         const html =
           makeBox(
             "Total " + (isIDX ? "lot" : "share"),
             isIDX ? lots.toFixed(0) + " lot" : lots.toFixed(0) + " share",
             "blue",
-          ) +
-          makeBox(
-            "Total lembar/share",
-            totalShares.toLocaleString("id-ID"),
-            "blue",
+            avgSubInfo,
           ) +
           makeBox("Total modal", fmt(totalCost, isIDX), "blue") +
           makeBox("Rata-rata harga beli", fmt(avgPrice, isIDX), "green");
