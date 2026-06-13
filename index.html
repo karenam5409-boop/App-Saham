@@ -1,0 +1,1578 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kalkulator Saham Analytics Pro</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
+    />
+
+    <style>
+      /* 1. ARCHITECTURAL RESET & DESIGN SYSTEM */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* DEFINISI VARIABEL PREMIUM (LIGHT MODE - DEFAULT) */
+      :root {
+        --canvas-bg: #f4f6f9;
+        --panel-bg: #ffffff;
+        --card-bg: #f8fafc;
+        --input-border: #cbd5e1;
+        --input-focus: #0f172a;
+
+        /* Sistem Navigasi Kapsul Premium */
+        --menu-bg: #e2e8f0;
+        --menu-btn-hover: #f1f5f9;
+        --menu-btn-active: #ffffff;
+
+        /* Hirarki Tipografi */
+        --text-main: #0f172a;
+        --text-muted: #475569;
+        --text-ghost: #64748b;
+
+        /* Indikator Finansial Presisi Tinggi (Aman untuk Mata) */
+        --color-gain: #059669;
+        --color-loss: #e11d48;
+        --color-neutral: #2563eb;
+
+        --font-workspace:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, sans-serif;
+      }
+
+      /* SISTEM DETEKSI OTOMATIS TEMA GADGET (PREMIUM DARK MODE) */
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --canvas-bg: #090d16;
+          --panel-bg: #111827;
+          --card-bg: #1f2937;
+          --input-border: #374151;
+          --input-focus: #38bdf8;
+
+          --menu-bg: #0d1117;
+          --menu-btn-hover: #1f2937;
+          --menu-btn-active: #2d3748;
+
+          --text-main: #ffffff;
+          --text-muted: #9ca3af;
+          --text-ghost: #6b7280;
+
+          --color-gain: #10b981;
+          --color-loss: #f43f5e;
+          --color-neutral: #3b82f6;
+        }
+      }
+
+      body {
+        background-color: var(--canvas-bg);
+        color: var(--text-muted);
+        font-family: var(--font-workspace);
+        padding: 4rem 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        transition: background-color 0.3s ease;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* 2. DASHBOARD PANEL WRAPPER */
+      .wrap {
+        max-width: 1000px;
+        width: 100%;
+        background-color: var(--panel-bg);
+        border-radius: 20px;
+        padding: 3rem;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        transition:
+          background-color 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .wrap {
+          border-color: rgba(255, 255, 255, 0.02);
+          box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+        }
+      }
+
+      /* STYLING HEADER KOMPONEN DENGAN LAYOUT SUSUNAN FLEXBOX KANAN-KIRI */
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        gap: 16px;
+      }
+
+      .header-group {
+        flex: 1;
+      }
+
+      .header-title {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: -0.5px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 4px;
+      }
+
+      .header-subtitle {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-ghost);
+      }
+
+      /* STYLE PREMIUM UNTUK TOMBOL RESET SPESIFIK */
+      .btn-reset-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        font-size: 13.5px;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 1px solid var(--input-border);
+        background-color: var(--panel-bg);
+        color: var(--text-muted);
+        transition: all 0.15s ease;
+      }
+
+      .btn-reset-tab:hover {
+        color: var(--color-loss);
+        border-color: rgba(225, 29, 72, 0.4);
+        background-color: rgba(225, 29, 72, 0.04);
+      }
+
+      .btn-reset-tab:active {
+        transform: scale(0.96);
+      }
+
+      /* 3. SEGMENTED CONTROL MENU */
+      .menu {
+        display: flex;
+        gap: 4px;
+        background-color: var(--menu-bg);
+        padding: 6px;
+        border-radius: 12px;
+        margin-bottom: 3.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.02);
+        transition: background-color 0.3s ease;
+
+        overflow-x: auto;
+        white-space: nowrap;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .menu::-webkit-scrollbar {
+        display: none;
+      }
+
+      .menu-btn {
+        flex: 1;
+        flex-shrink: 0;
+        padding: 14px 16px;
+        font-size: 13.5px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        border-radius: 8px;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition:
+          color 0.2s ease,
+          background-color 0.2s ease,
+          transform 0.1s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .menu-btn:hover {
+        color: var(--text-main);
+        background-color: var(--menu-btn-hover);
+      }
+
+      .menu-btn:active {
+        transform: scale(0.98);
+      }
+
+      .menu-btn.active {
+        background-color: var(--menu-btn-active);
+        color: var(--text-main);
+        box-shadow:
+          0 4px 12px rgba(0, 0, 0, 0.05),
+          0 1px 3px rgba(0, 0, 0, 0.02);
+        border-bottom: 2px solid var(--input-focus);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .menu-btn.active {
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+          border-bottom-color: var(--input-focus);
+        }
+      }
+
+      /* 4. SECTION STRUCTURAL DESIGN */
+      .calc {
+        display: none;
+      }
+      .calc.active {
+        display: block;
+        animation: sectionFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .card {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        margin-bottom: 3rem;
+      }
+
+      .section-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--text-ghost);
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .section-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background-color: var(--input-border);
+        opacity: 0.2;
+      }
+
+      /* 5. INDUSTRIAL FORM COMPONENTS */
+      .row,
+      .row3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 28px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .field label {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .field input,
+      .field select {
+        font-size: 14.5px;
+        font-weight: 500;
+        padding: 14px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--input-border);
+        background-color: var(--panel-bg);
+        color: var(--text-main);
+        outline: none;
+        width: 100%;
+        transition:
+          border-color 0.15s ease,
+          box-shadow 0.15s ease,
+          background-color 0.3s ease;
+      }
+
+      .field input:hover,
+      .field select:hover {
+        border-color: #94a3b8;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .field input,
+        .field select {
+          background-color: var(--menu-bg);
+        }
+        .field input:hover,
+        .field select:hover {
+          border-color: #4b5563;
+        }
+      }
+
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--input-focus);
+        box-shadow: 0 0 0 1px var(--input-focus);
+      }
+
+      .field input::-webkit-outer-spin-button,
+      .field input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      /* 6. INTERACTIVE POP-UP MODAL ARCHITECTURE */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-window {
+        background-color: var(--panel-bg);
+        border-radius: 16px;
+        max-width: 650px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        border: 1px solid var(--border-low);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        padding: 2rem;
+        transform: scale(0.95) translateY(10px);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .modal-overlay.active .modal-window {
+        transform: scale(1) translateY(0);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--input-border);
+      }
+
+      .modal-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .modal-close-icon {
+        font-size: 20px;
+        color: var(--text-ghost);
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        transition: color 0.15s ease;
+      }
+
+      .modal-close-icon:hover {
+        color: var(--color-loss);
+      }
+
+      /* Grid Pop-up Desktop & HP */
+      .result-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+
+      .result-box {
+        background-color: var(--card-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 10px;
+        transition: background-color 0.2s ease;
+      }
+
+      .result-box:hover {
+        border-color: var(--input-focus);
+      }
+
+      .result-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-ghost);
+      }
+
+      .result-val {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-main);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .result-val.green {
+        color: var(--color-gain);
+      }
+      .result-val.red {
+        color: var(--color-loss);
+      }
+      .result-val.blue {
+        color: var(--color-neutral);
+      }
+
+      .modal-actions {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .btn-modal-close {
+        background-color: var(--input-focus);
+        color: var(--panel-bg);
+        border: none;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
+        transition: opacity 0.15s ease;
+      }
+
+      .btn-modal-close:hover {
+        opacity: 0.9;
+      }
+
+      /* FLOATING TRIGGER BUTTON (TETAP MENJADI TOMBOL UTAMA PEMICU MODAL) */
+      .floating-result-trigger {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background-color: var(--color-neutral);
+        color: white;
+        padding: 14px 20px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 700;
+        border: none;
+        box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+        cursor: pointer;
+        display: none; /* Hanya muncul otomatis lewat JS jika data lengkap */
+        align-items: center;
+        gap: 8px;
+        z-index: 999;
+        transform: translateY(0);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .floating-result-trigger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px -5px rgba(37, 99, 235, 0.5);
+      }
+
+      /* 7. KONTANER UTAMA TRANSAKSI AVERAGE (DIKUNCI SELALU HORIZONTAL SCROLL) */
+      #avg-rows {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 16px;
+        margin-bottom: 20px;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 12px;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      #avg-rows::-webkit-scrollbar {
+        display: none;
+      }
+
+      .avg-row {
+        flex: 0 0 290px;
+        background-color: var(--card-bg);
+        border: 1px solid var(--input-border);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        animation: rowEnter 0.2s ease-out;
+      }
+
+      .avg-row-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2px;
+      }
+
+      .avg-row-title {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+
+      /* 8. BUTTONS ENGINE & UTILITIES */
+      .btn-add,
+      .btn-remove {
+        font-size: 13.5px;
+        font-weight: 700;
+        border-radius: 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.15s ease;
+      }
+
+      .btn-add {
+        background-color: var(--text-main);
+        color: var(--panel-bg);
+        border: none;
+        padding: 14px 24px;
+        margin-top: 1rem;
+      }
+
+      .btn-add:hover {
+        opacity: 0.9;
+      }
+
+      .btn-add:active {
+        transform: scale(0.97);
+      }
+
+      .btn-remove {
+        padding: 6px 12px;
+        font-size: 12px;
+        color: var(--text-ghost);
+        border: 1px solid var(--input-border);
+        background-color: var(--panel-bg);
+      }
+
+      .btn-remove:hover {
+        color: var(--color-loss);
+        border-color: rgba(244, 63, 94, 0.4);
+        background-color: rgba(244, 63, 94, 0.05);
+      }
+
+      .hint {
+        font-size: 12px;
+        color: var(--text-ghost);
+        margin-top: 2rem;
+        line-height: 1.6;
+      }
+
+      .divider {
+        display: none;
+      }
+      .full {
+        grid-column: 1 / -1;
+      }
+
+      /* 9. HIGH-PERFORMANCE EASING ANIMATIONS */
+      @keyframes sectionFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes rowEnter {
+        from {
+          opacity: 0;
+          transform: scale(0.99);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* RESPONSIVE DESIGN ARCHITECTURE */
+      @media (max-width: 768px) {
+        body {
+          padding: 1.5rem 1rem;
+        }
+        .wrap {
+          padding: 1.25rem;
+          border-radius: 16px;
+          width: 100%;
+          overflow: hidden;
+        }
+        .header-container {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+        }
+        .btn-reset-tab {
+          width: 100%;
+          justify-content: center;
+        }
+        .menu {
+          gap: 4px;
+          margin-bottom: 2.5rem;
+        }
+
+        /* FIX ABSOLUT: 2 KOLOM SEJAJAR ANTI-LETAK BOCOR DI HP */
+        .row,
+        .row3 {
+          display: grid !important;
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 12px 10px !important;
+          width: 100% !important;
+        }
+
+        .row > .field:first-child,
+        .row3 > .field:first-child {
+          grid-column: span 2 !important;
+        }
+
+        .field label {
+          font-size: 11.5px !important;
+        }
+
+        .field input,
+        .field select {
+          padding: 10px 8px !important;
+          font-size: 13.5px !important;
+        }
+
+        /* POP-UP BOX TETAP 2 KOLOM DI MOBILE */
+        .result-grid {
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 10px;
+        }
+
+        .result-box {
+          padding: 12px 10px;
+          gap: 6px;
+          border-radius: 10px;
+        }
+
+        .result-label {
+          font-size: 9.5px;
+          letter-spacing: 0.3px;
+        }
+
+        .result-val {
+          font-size: 15px;
+        }
+
+        /* DI HP, BOKS TRANSAKSI TETAP MENYAMPING SECARA KONSISTEN */
+        .avg-row {
+          flex: 0 0 250px;
+          padding: 16px 14px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="header-container">
+        <div class="header-group">
+          <h1 class="header-title"><span>📈</span> Kalkulator Saham</h1>
+          <div class="header-subtitle">IDX & US · Data tersimpan otomatis</div>
+        </div>
+        <button
+          type="button"
+          class="btn-reset-tab"
+          onclick="resetActiveTabData()"
+        >
+          <i class="ti ti-refresh" aria-hidden="true"></i> Reset Menu Ini
+        </button>
+      </div>
+
+      <div class="menu">
+        <button
+          type="button"
+          class="menu-btn active"
+          onclick="showCalc('pl', this)"
+        >
+          <i class="ti ti-trending-up" aria-hidden="true"></i> Profit / Loss
+        </button>
+        <button type="button" class="menu-btn" onclick="showCalc('div', this)">
+          <i class="ti ti-coin" aria-hidden="true"></i> Dividen
+        </button>
+        <button type="button" class="menu-btn" onclick="showCalc('bep', this)">
+          <i class="ti ti-target" aria-hidden="true"></i> Break Even
+        </button>
+        <button type="button" class="menu-btn" onclick="showCalc('roi', this)">
+          <i class="ti ti-chart-bar" aria-hidden="true"></i> ROI
+        </button>
+        <button type="button" class="menu-btn" onclick="showCalc('avg', this)">
+          <i class="ti ti-math-avg" aria-hidden="true"></i> Average Down/Up
+        </button>
+      </div>
+
+      <div id="calc-pl" class="calc active">
+        <div class="card">
+          <div class="section-label">Informasi saham</div>
+          <div class="row">
+            <div class="field">
+              <label for="pl-market">Pasar</label>
+              <select id="pl-market" onchange="calcPL()">
+                <option value="IDX">IDX — Indonesia (Rp, lot)</option>
+                <option value="US">US — Amerika ($, share)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label id="pl-qty-label" for="pl-qty">Jumlah lot beli</label>
+              <input
+                type="number"
+                id="pl-qty"
+                value=""
+                placeholder="Contoh: 10"
+                min="1"
+                oninput="calcPL()"
+              />
+            </div>
+            <div class="field">
+              <label id="pl-buylabel" for="pl-buy"
+                >Harga beli per lembar (Rp)</label
+              >
+              <input
+                type="number"
+                id="pl-buy"
+                value=""
+                placeholder="Contoh: 5000"
+                oninput="calcPL()"
+              />
+            </div>
+            <div class="field">
+              <label id="pl-selllabel" for="pl-sell"
+                >Harga jual per lembar (Rp)</label
+              >
+              <input
+                type="number"
+                id="pl-sell"
+                value=""
+                placeholder="Contoh: 6000"
+                oninput="calcPL()"
+              />
+            </div>
+            <div class="field">
+              <label for="pl-feebuy">Fee beli broker (%)</label>
+              <input
+                type="number"
+                id="pl-feebuy"
+                value=""
+                placeholder="Contoh: 0.15"
+                step="0.01"
+                oninput="calcPL()"
+              />
+            </div>
+            <div class="field">
+              <label for="pl-feesell">Fee jual broker (%)</label>
+              <input
+                type="number"
+                id="pl-feesell"
+                value=""
+                placeholder="Contoh: 0.25"
+                step="0.01"
+                oninput="calcPL()"
+              />
+            </div>
+          </div>
+          <div class="hint" id="pl-hint">
+            IDX: PPh final 0.1% sudah termasuk dalam perhitungan fee jual
+          </div>
+        </div>
+      </div>
+
+      <div id="calc-div" class="calc">
+        <div class="card">
+          <div class="section-label">Informasi dividen</div>
+          <div class="row">
+            <div class="field">
+              <label for="div-market">Pasar</label>
+              <select id="div-market" onchange="calcDiv()">
+                <option value="IDX">IDX — Indonesia (Rp, pajak 10%)</option>
+                <option value="US">US — Amerika ($, pajak 30%)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label id="div-share-label" for="div-shares"
+                >Jumlah lembar dimiliki</label
+              >
+              <input
+                type="number"
+                id="div-shares"
+                value=""
+                placeholder="Contoh: 1000"
+                oninput="calcDiv()"
+              />
+            </div>
+            <div class="field">
+              <label id="div-dps-label" for="div-dps"
+                >Dividen per lembar (Rp)</label
+              >
+              <input
+                type="number"
+                id="div-dps"
+                value=""
+                placeholder="Contoh: 100"
+                oninput="calcDiv()"
+              />
+            </div>
+            <div class="field">
+              <label id="div-price-label" for="div-price"
+                >Harga saham saat ini (Rp)</label
+              >
+              <input
+                type="number"
+                id="div-price"
+                value=""
+                placeholder="Contoh: 5000"
+                oninput="calcDiv()"
+              />
+            </div>
+          </div>
+          <div class="hint" id="div-hint">
+            IDX: pajak dividen 10% (PPh final). US: WHT 30% standar.
+          </div>
+        </div>
+      </div>
+
+      <div id="calc-bep" class="calc">
+        <div class="card">
+          <div class="section-label">Hitung harga balik modal</div>
+          <div class="row">
+            <div class="field">
+              <label for="bep-market">Pasar</label>
+              <select id="bep-market" onchange="calcBEP()">
+                <option value="IDX">IDX — Indonesia</option>
+                <option value="US">US — Amerika</option>
+              </select>
+            </div>
+            <div class="field">
+              <label id="bep-qty-label" for="bep-qty">Jumlah lot beli</label>
+              <input
+                type="number"
+                id="bep-qty"
+                value=""
+                placeholder="Contoh: 10"
+                oninput="calcBEP()"
+              />
+            </div>
+            <div class="field">
+              <label id="bep-buy-label" for="bep-buy"
+                >Harga beli per lembar (Rp)</label
+              >
+              <input
+                type="number"
+                id="bep-buy"
+                value=""
+                placeholder="Contoh: 5000"
+                oninput="calcBEP()"
+              />
+            </div>
+            <div class="field">
+              <label for="bep-feebuy">Fee beli (%)</label>
+              <input
+                type="number"
+                id="bep-feebuy"
+                value=""
+                placeholder="Contoh: 0.15"
+                step="0.01"
+                oninput="calcBEP()"
+              />
+            </div>
+            <div class="field">
+              <label for="bep-feesell">Fee jual (%)</label>
+              <input
+                type="number"
+                id="bep-feesell"
+                value=""
+                placeholder="Contoh: 0.25"
+                step="0.01"
+                oninput="calcBEP()"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="calc-roi" class="calc">
+        <div class="card">
+          <div class="section-label">Return on investment</div>
+          <div class="row">
+            <div class="field">
+              <label for="roi-modal">Total modal awal (Rp / $)</label>
+              <input
+                type="number"
+                id="roi-modal"
+                value=""
+                placeholder="Contoh: 10000000"
+                oninput="calcROI()"
+              />
+            </div>
+            <div class="field">
+              <label for="roi-nilai"
+                >Nilai saat ini / hasil jual (Rp / $)</label
+              >
+              <input
+                type="number"
+                id="roi-nilai"
+                value=""
+                placeholder="Contoh: 12500000"
+                oninput="calcROI()"
+              />
+            </div>
+            <div class="field">
+              <label for="roi-div">Total dividen diterima (Rp / $)</label>
+              <input
+                type="number"
+                id="roi-div"
+                value=""
+                placeholder="Contoh: 500000"
+                oninput="calcROI()"
+              />
+            </div>
+            <div class="field">
+              <label for="roi-bulan">Lama investasi (bulan)</label>
+              <input
+                type="number"
+                id="roi-bulan"
+                value=""
+                placeholder="Contoh: 12"
+                oninput="calcROI()"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="calc-avg" class="calc">
+        <div class="card">
+          <div class="section-label">Hitung rata-rata harga beli</div>
+          <div class="field" style="margin-bottom: 20px">
+            <label for="avg-market">Pasar</label>
+            <select id="avg-market" style="width: 200px">
+              <option value="IDX">IDX — lot (1 lot = 100 lembar)</option>
+              <option value="US">US — share</option>
+            </select>
+          </div>
+          <div id="avg-rows"></div>
+          <button type="button" class="btn-add" onclick="addAvgRow()">
+            <i class="ti ti-plus" aria-hidden="true"></i> Tambah transaksi
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="result-modal" class="modal-overlay">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title">
+            <i class="ti ti-chart-bar"></i> Hasil Analisis Kalkulasi
+          </div>
+          <button type="button" class="modal-close-icon" onclick="closeModal()">
+            <i class="ti ti-x"></i>
+          </button>
+        </div>
+        <div id="modal-grid-content" class="result-grid"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-close" onclick="closeModal()">
+            Selesai & Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      id="floating-trigger"
+      class="floating-result-trigger"
+      onclick="openModal()"
+    >
+      <i class="ti ti-presentation-analytics"></i> Lihat Hasil Analisis
+    </button>
+
+    <script>
+      // PENGATURAN STORAGE KEY UNIK AGAR TIDAK BENTROK
+      const STORAGE_KEYS = {
+        ACTIVE_TAB: "saham_calc_active_tab",
+        DATA_PL: "saham_calc_data_pl",
+        DATA_DIV: "saham_calc_data_div",
+        DATA_BEP: "saham_calc_data_bep",
+        DATA_ROI: "saham_calc_data_roi",
+        DATA_AVG: "saham_calc_data_avg",
+      };
+
+      // INITIAL LOADING LOCK LOGIC
+      let isInitialLoading = true;
+
+      function openModal() {
+        document.getElementById("result-modal").classList.add("active");
+      }
+
+      function closeModal() {
+        document.getElementById("result-modal").classList.remove("active");
+      }
+
+      // PERBAIKAN TOTAL INTERAKSI: TOMBOL HANYA MUNCUL JIKA KONDISI KOLOM TERISI PENUH
+      function handlePopupDisplay(contentHtml, isValidData) {
+        const floatingBtn = document.getElementById("floating-trigger");
+        if (isValidData) {
+          document.getElementById("modal-grid-content").innerHTML = contentHtml;
+          floatingBtn.style.display =
+            "inline-flex"; /* Tampilkan tombol mengambang pasif */
+        } else {
+          document.getElementById("modal-grid-content").innerHTML = "";
+          floatingBtn.style.display =
+            "none"; /* Sembunyikan tombol mengambang jika ada kolom kosong */
+          closeModal();
+        }
+      }
+
+      function showCalc(id, btn) {
+        document
+          .querySelectorAll(".calc")
+          .forEach((c) => c.classList.remove("active"));
+        document
+          .querySelectorAll(".menu-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById("calc-" + id).classList.add("active");
+
+        if (btn) {
+          btn.classList.add("active");
+        } else {
+          const targetBtn = Array.from(
+            document.querySelectorAll(".menu-btn"),
+          ).find((b) => b.getAttribute("onclick").includes(`'${id}'`));
+          if (targetBtn) targetBtn.classList.add("active");
+        }
+
+        localStorage.setItem(STORAGE_KEYS.ACTIVE_TAB, id);
+        if (id === "pl") calcPL();
+        if (id === "div") calcDiv();
+        if (id === "bep") calcBEP();
+        if (id === "roi") calcROI();
+        if (id === "avg") calcAVG();
+      }
+
+      function rp(n) {
+        return "Rp " + Math.round(n).toLocaleString("id-ID");
+      }
+      function usd(n) {
+        return (n < 0 ? "-$" : "$") + Math.abs(n).toFixed(2);
+      }
+      function fmt(n, isIDX) {
+        return isIDX ? rp(n) : usd(n);
+      }
+      function pct(n) {
+        return (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
+      }
+
+      function makeBox(label, val, cls) {
+        return `<div class="result-box"><div class="result-label">${label}</div><div class="result-val ${cls || ""}">${val}</div></div>`;
+      }
+
+      function saveFormFields(storageKey, fieldIds) {
+        const data = {};
+        fieldIds.forEach((id) => {
+          data[id] = document.getElementById(id).value;
+        });
+        localStorage.setItem(storageKey, JSON.stringify(data));
+      }
+
+      function loadFormFields(storageKey, fieldIds, callback) {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+          try {
+            const data = JSON.parse(saved);
+            fieldIds.forEach((id) => {
+              if (data[id] !== undefined)
+                document.getElementById(id).value = data[id];
+            });
+          } catch (e) {
+            console.error("Error loading localStorage", e);
+          }
+        }
+        if (callback) callback();
+      }
+
+      function resetActiveTabData() {
+        const activeTab = localStorage.getItem(STORAGE_KEYS.ACTIVE_TAB) || "pl";
+
+        if (activeTab === "pl") {
+          localStorage.removeItem(STORAGE_KEYS.DATA_PL);
+          ["pl-qty", "pl-buy", "pl-sell", "pl-feebuy", "pl-feesell"].forEach(
+            (id) => (document.getElementById(id).value = ""),
+          );
+          document.getElementById("pl-market").value = "IDX";
+          calcPL();
+        } else if (activeTab === "div") {
+          localStorage.removeItem(STORAGE_KEYS.DATA_DIV);
+          ["div-shares", "div-dps", "div-price"].forEach(
+            (id) => (document.getElementById(id).value = ""),
+          );
+          document.getElementById("div-market").value = "IDX";
+          calcDiv();
+        } else if (activeTab === "bep") {
+          localStorage.removeItem(STORAGE_KEYS.DATA_BEP);
+          ["bep-qty", "bep-buy", "bep-feebuy", "bep-feesell"].forEach(
+            (id) => (document.getElementById(id).value = ""),
+          );
+          document.getElementById("bep-market").value = "IDX";
+          calcBEP();
+        } else if (activeTab === "roi") {
+          localStorage.removeItem(STORAGE_KEYS.DATA_ROI);
+          ["roi-modal", "roi-nilai", "roi-div", "roi-bulan"].forEach(
+            (id) => (document.getElementById(id).value = ""),
+          );
+          calcROI();
+        } else if (activeTab === "avg") {
+          localStorage.removeItem(STORAGE_KEYS.DATA_AVG);
+          document.getElementById("avg-market").value = "IDX";
+          avgRows = [
+            { qty: 0, price: 0, isNew: true },
+            { qty: 0, price: 0, isNew: true },
+          ];
+          renderAvgRows();
+        }
+      }
+
+      function calcPL() {
+        const market = document.getElementById("pl-market").value;
+        const isIDX = market === "IDX";
+
+        const rawQty = document.getElementById("pl-qty").value;
+        const rawBuy = document.getElementById("pl-buy").value;
+        const rawSell = document.getElementById("pl-sell").value;
+        const rawFeeBuy = document.getElementById("pl-feebuy").value;
+        const rawFeeSell = document.getElementById("pl-feesell").value;
+
+        document.getElementById("pl-qty-label").textContent = isIDX
+          ? "Jumlah lot beli"
+          : "Jumlah share beli";
+        document.getElementById("pl-buylabel").textContent = isIDX
+          ? "Harga beli per lembar (Rp)"
+          : "Harga beli per share ($)";
+        document.getElementById("pl-selllabel").textContent = isIDX
+          ? "Harga jual per lembar (Rp)"
+          : "Harga jual per share ($)";
+        document.getElementById("pl-hint").textContent = isIDX
+          ? "IDX: PPh final 0.1% sudah termasuk dalam perhitungan biaya jual."
+          : "US: tidak ada PPh final per transaksi, pajak capital gain ditanggung investor.";
+
+        saveFormFields(STORAGE_KEYS.DATA_PL, [
+          "pl-market",
+          "pl-qty",
+          "pl-buy",
+          "pl-sell",
+          "pl-feebuy",
+          "pl-feesell",
+        ]);
+
+        if (!rawQty || !rawBuy || !rawSell || !rawFeeBuy || !rawFeeSell) {
+          handlePopupDisplay("", false);
+          return;
+        }
+
+        const qty = parseFloat(rawQty) || 0;
+        const buyPrice = parseFloat(rawBuy) || 0;
+        const sellPrice = parseFloat(rawSell) || 0;
+        const feeBuy = (parseFloat(rawFeeBuy) || 0) / 100;
+        const feeSell = (parseFloat(rawFeeSell) || 0) / 100;
+
+        const shares = isIDX ? qty * 100 : qty;
+        const totalBuy = shares * buyPrice * (1 + feeBuy);
+        const pph = isIDX ? shares * sellPrice * 0.001 : 0;
+        const totalSell = shares * sellPrice * (1 - feeSell) - pph;
+        const pl = totalSell - totalBuy;
+        const plPct = totalBuy > 0 ? (pl / totalBuy) * 100 : 0;
+        const feeBuyRp = shares * buyPrice * feeBuy;
+        const feeSellRp = shares * sellPrice * feeSell;
+
+        const isProfit = pl >= 0;
+        const html =
+          makeBox("Total modal beli", fmt(totalBuy, isIDX), "blue") +
+          makeBox("Hasil jual (net)", fmt(totalSell, isIDX), "blue") +
+          makeBox(
+            isProfit ? "Profit" : "Loss",
+            fmt(pl, isIDX),
+            isProfit ? "green" : "red",
+          ) +
+          makeBox("Return", pct(plPct), isProfit ? "green" : "red") +
+          makeBox("Fee beli", fmt(feeBuyRp, isIDX), "") +
+          makeBox("Fee jual", fmt(feeSellRp, isIDX), "") +
+          (isIDX ? makeBox("PPh final (0.1%)", rp(pph), "") : "");
+
+        handlePopupDisplay(html, true);
+      }
+
+      function calcDiv() {
+        const market = document.getElementById("div-market").value;
+        const isIDX = market === "IDX";
+
+        const rawShares = document.getElementById("div-shares").value;
+        const rawDps = document.getElementById("div-dps").value;
+        const rawPrice = document.getElementById("div-price").value;
+
+        document.getElementById("div-share-label").textContent =
+          "Jumlah lembar/share dimiliki";
+        document.getElementById("div-dps-label").textContent = isIDX
+          ? "Dividen per lembar (Rp)"
+          : "Dividen per share ($)";
+        document.getElementById("div-price-label").textContent = isIDX
+          ? "Harga saham saat ini (Rp)"
+          : "Harga saham saat ini ($)";
+        document.getElementById("div-hint").textContent = isIDX
+          ? "IDX: pajak dividen 10% (PPh final, sudah dipotong perusahaan)."
+          : "US: WHT 30% standar, bisa 15% jika ada perjanjian pajak.";
+
+        saveFormFields(STORAGE_KEYS.DATA_DIV, [
+          "div-market",
+          "div-shares",
+          "div-dps",
+          "div-price",
+        ]);
+
+        if (!rawShares || !rawDps || !rawPrice) {
+          handlePopupDisplay("", false);
+          return;
+        }
+
+        const shares = parseFloat(rawShares) || 0;
+        const dps = parseFloat(rawDps) || 0;
+        const price = parseFloat(rawPrice) || 0;
+
+        const taxRate = isIDX ? 0.1 : 0.3;
+        const gross = shares * dps;
+        const tax = gross * taxRate;
+        const net = gross - tax;
+        const divYield = price > 0 ? (dps / price) * 100 : 0;
+
+        const html =
+          makeBox("Dividen kotor", fmt(gross, isIDX), "blue") +
+          makeBox(
+            "Pajak (" + (isIDX ? "10%" : "30%") + ")",
+            fmt(tax, isIDX),
+            "red",
+          ) +
+          makeBox("Dividen bersih", fmt(net, isIDX), "green") +
+          makeBox("Dividend yield", divYield.toFixed(2) + "%", "blue");
+
+        handlePopupDisplay(html, true);
+      }
+
+      function calcBEP() {
+        const market = document.getElementById("bep-market").value;
+        const isIDX = market === "IDX";
+
+        const rawQty = document.getElementById("bep-qty").value;
+        const rawBuy = document.getElementById("bep-buy").value;
+        const rawFeeBuy = document.getElementById("bep-feebuy").value;
+        const rawFeeSell = document.getElementById("bep-feesell").value;
+
+        document.getElementById("bep-qty-label").textContent = isIDX
+          ? "Jumlah lot beli"
+          : "Jumlah share beli";
+        document.getElementById("bep-buy-label").textContent = isIDX
+          ? "Harga beli per lembar (Rp)"
+          : "Harga beli per share ($)";
+
+        saveFormFields(STORAGE_KEYS.DATA_BEP, [
+          "bep-market",
+          "bep-qty",
+          "bep-buy",
+          "bep-feebuy",
+          "bep-feesell",
+        ]);
+
+        if (!rawQty || !rawBuy || !rawFeeBuy || !rawFeeSell) {
+          handlePopupDisplay("", false);
+          return;
+        }
+
+        const qty = parseFloat(rawQty) || 0;
+        const buyPrice = parseFloat(rawBuy) || 0;
+        const feeBuy = (parseFloat(rawFeeBuy) || 0) / 100;
+        const feeSell = (parseFloat(rawFeeSell) || 0) / 100;
+
+        const shares = isIDX ? qty * 100 : qty;
+        const totalBuy = shares * buyPrice * (1 + feeBuy);
+        const pphRate = isIDX ? 0.001 : 0;
+        const bep = totalBuy / (shares * (1 - feeSell - pphRate));
+        const bepPct = buyPrice > 0 ? ((bep - buyPrice) / buyPrice) * 100 : 0;
+
+        const html =
+          makeBox("Total modal", fmt(totalBuy, isIDX), "blue") +
+          makeBox("Harga BEP", fmt(bep, isIDX), "blue") +
+          makeBox(
+            "Selisih dari harga beli",
+            pct(bepPct),
+            bepPct >= 0 ? "" : "green",
+          ) +
+          (isIDX
+            ? makeBox(
+                "Harga BEP (dibulatkan)",
+                rp(Math.ceil(bep / 50) * 50) + " (fraksi terdekat)",
+                "",
+              )
+            : "");
+
+        handlePopupDisplay(html, true);
+      }
+
+      function calcROI() {
+        const rawModal = document.getElementById("roi-modal").value;
+        const rawNilai = document.getElementById("roi-nilai").value;
+        const rawDiv = document.getElementById("roi-div").value;
+        const rawBulan = document.getElementById("roi-bulan").value;
+
+        saveFormFields(STORAGE_KEYS.DATA_ROI, [
+          "roi-modal",
+          "roi-nilai",
+          "roi-div",
+          "roi-bulan",
+        ]);
+
+        if (!rawModal || !rawNilai || !rawDiv || !rawBulan) {
+          handlePopupDisplay("", false);
+          return;
+        }
+
+        const modal = parseFloat(rawModal) || 0;
+        const nilai = parseFloat(rawNilai) || 0;
+        const div = parseFloat(rawDiv) || 0;
+        const bulan = parseFloat(rawBulan) || 1;
+
+        const totalReturn = nilai - modal + div;
+        const roi = modal > 0 ? (totalReturn / modal) * 100 : 0;
+        const annualized =
+          bulan > 0 ? (Math.pow(1 + roi / 100, 12 / bulan) - 1) * 100 : 0;
+        const isProfit = totalReturn >= 0;
+
+        const html =
+          makeBox(
+            "Total return",
+            "Rp " + Math.round(totalReturn).toLocaleString("id-ID"),
+            isProfit ? "green" : "red",
+          ) +
+          makeBox("ROI", pct(roi), isProfit ? "green" : "red") +
+          makeBox(
+            "ROI annualized",
+            pct(annualized),
+            isProfit ? "green" : "red",
+          ) +
+          makeBox(
+            "Capital gain",
+            "Rp " + Math.round(nilai - modal).toLocaleString("id-ID"),
+            nilai - modal >= 0 ? "green" : "red",
+          ) +
+          makeBox(
+            "Kontribusi dividen",
+            "Rp " + Math.round(div).toLocaleString("id-ID"),
+            "blue",
+          );
+
+        handlePopupDisplay(html, true);
+      }
+
+      let avgRows = [];
+
+      function renderAvgRows() {
+        const market = document.getElementById("avg-market").value;
+        const isIDX = market === "IDX";
+        const container = document.getElementById("avg-rows");
+
+        container.innerHTML = avgRows
+          .map(
+            (r, i) => `
+    <div class="avg-row">
+      <div class="avg-row-header">
+        <span class="avg-row-title">${i === 0 ? "Transaksi 1" : "Transaksi " + (i + 1)}</span>
+        ${avgRows.length > 1 ? `<button type="button" class="btn-remove" onclick="removeAvgRow(${i})"><i class="ti ti-trash" aria-hidden="true"></i> Hapus</button>` : "<div></div>"}
+      </div>
+      <div class="field">
+        <label>${isIDX ? "Jumlah lot beli" : "Jumlah share beli"}</label>
+        <input type="number" value="${r.qty === 0 && r.isNew ? "" : r.qty}" placeholder="${isIDX ? "lot" : "share"}" oninput="avgRows[${i}].qty=parseFloat(this.value)||0; delete avgRows[${i}].isNew; calcAVG()" >
+      </div>
+      <div class="field">
+        <label>${isIDX ? "Harga per lembar (Rp)" : "Harga per share ($)"}</label>
+        <input type="number" value="${r.price === 0 && r.isNew ? "" : r.price}" placeholder="Harga" oninput="avgRows[${i}].price=parseFloat(this.value)||0; delete avgRows[${i}].isNew; calcAVG()">
+      </div>
+    </div>`,
+          )
+          .join("");
+        calcAVG();
+      }
+
+      function addAvgRow() {
+        avgRows.push({ qty: 0, price: 0, isNew: true });
+        renderAvgRows();
+      }
+
+      function removeAvgRow(i) {
+        avgRows.splice(i, 1);
+        renderAvgRows();
+      }
+
+      function calcAVG() {
+        const market = document.getElementById("avg-market").value;
+        const isIDX = market === "IDX";
+
+        const cleanRowsToSave = avgRows.map((r) => ({
+          qty: r.qty,
+          price: r.price,
+        }));
+        localStorage.setItem(
+          STORAGE_KEYS.DATA_AVG,
+          JSON.stringify({ market: market, rows: cleanRowsToSave }),
+        );
+
+        const hasEmptyField =
+          avgRows.length === 0 ||
+          avgRows.some((r) => r.qty === 0 || r.price === 0);
+
+        if (hasEmptyField) {
+          handlePopupDisplay("", false);
+          return;
+        }
+
+        let totalShares = 0,
+          totalCost = 0;
+        avgRows.forEach((r) => {
+          const shares = isIDX ? r.qty * 100 : r.qty;
+          totalShares += shares;
+          totalCost += shares * r.price;
+        });
+        const avgPrice = totalShares > 0 ? totalCost / totalShares : 0;
+        const lots = isIDX ? totalShares / 100 : totalShares;
+
+        const html =
+          makeBox(
+            "Total " + (isIDX ? "lot" : "share"),
+            isIDX ? lots.toFixed(0) + " lot" : lots.toFixed(0) + " share",
+            "blue",
+          ) +
+          makeBox(
+            "Total lembar/share",
+            totalShares.toLocaleString("id-ID"),
+            "blue",
+          ) +
+          makeBox("Total modal", fmt(totalCost, isIDX), "blue") +
+          makeBox("Rata-rata harga beli", fmt(avgPrice, isIDX), "green");
+
+        handlePopupDisplay(html, true);
+      }
+
+      // MANAGEMENT INISIALISASI SAAT HALAMAN DI-LOAD PERTAMA KALI
+      document.addEventListener("DOMContentLoaded", () => {
+        isInitialLoading = true;
+
+        loadFormFields(
+          STORAGE_KEYS.DATA_PL,
+          [
+            "pl-market",
+            "pl-qty",
+            "pl-buy",
+            "pl-sell",
+            "pl-feebuy",
+            "pl-feesell",
+          ],
+          calcPL,
+        );
+        loadFormFields(
+          STORAGE_KEYS.DATA_DIV,
+          ["div-market", "div-shares", "div-dps", "div-price"],
+          calcDiv,
+        );
+        loadFormFields(
+          STORAGE_KEYS.DATA_BEP,
+          ["bep-market", "bep-qty", "bep-buy", "bep-feebuy", "bep-feesell"],
+          calcBEP,
+        );
+        loadFormFields(
+          STORAGE_KEYS.DATA_ROI,
+          ["roi-modal", "roi-nilai", "roi-div", "roi-bulan"],
+          calcROI,
+        );
+
+        const savedAvg = localStorage.getItem(STORAGE_KEYS.DATA_AVG);
+        if (savedAvg) {
+          try {
+            const parsedAvg = JSON.parse(savedAvg);
+            document.getElementById("avg-market").value =
+              parsedAvg.market || "IDX";
+            if (parsedAvg.rows && parsedAvg.rows.length > 0) {
+              avgRows = parsedAvg.rows;
+            } else {
+              avgRows = [
+                { qty: 0, price: 0, isNew: true },
+                { qty: 0, price: 0, isNew: true },
+              ];
+            }
+          } catch (e) {
+            avgRows = [
+              { qty: 0, price: 0, isNew: true },
+              { qty: 0, price: 0, isNew: true },
+            ];
+          }
+        } else {
+          avgRows = [
+            { qty: 0, price: 0, isNew: true },
+            { qty: 0, price: 0, isNew: true },
+          ];
+        }
+        renderAvgRows();
+
+        const activeTab = localStorage.getItem(STORAGE_KEYS.ACTIVE_TAB) || "pl";
+        showCalc(activeTab, null);
+
+        isInitialLoading = false;
+      });
+
+      document
+        .getElementById("avg-market")
+        .addEventListener("change", renderAvgRows);
+    </script>
+  </body>
+</html>
