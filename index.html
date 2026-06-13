@@ -306,6 +306,21 @@
           background-color 0.3s ease;
       }
 
+      /* BARU: SUB-CONTAINER INPUT BERPASANGAN UNTUK STRUKTUR (HARGA + FEE %) */
+      .paired-input-container {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .paired-input-container input:first-child {
+        flex: 2; /* Kolom Harga mengambil ruang lebih luas */
+      }
+
+      .paired-input-container input:last-child {
+        flex: 1; /* Kolom Fee (%) lebih kecil ringkas */
+      }
+
       .field input:hover,
       .field select:hover {
         border-color: #94a3b8;
@@ -480,7 +495,7 @@
         opacity: 0.9;
       }
 
-      /* FLOATING TRIGGER BUTTON (TETAP MENJADI TOMBOL UTAMA PEMICU MODAL) */
+      /* FLOATING TRIGGER BUTTON */
       .floating-result-trigger {
         position: fixed;
         bottom: 24px;
@@ -494,7 +509,7 @@
         border: none;
         box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
         cursor: pointer;
-        display: none; /* Hanya muncul otomatis lewat JS jika data lengkap */
+        display: none;
         align-items: center;
         gap: 8px;
         z-index: 999;
@@ -771,51 +786,47 @@
                 oninput="calcPL()"
               />
             </div>
+
             <div class="field">
-              <label id="pl-buylabel" for="pl-buy"
-                >Harga beli per lembar (Rp)</label
-              >
-              <input
-                type="number"
-                id="pl-buy"
-                value=""
-                placeholder="Contoh: 5000"
-                oninput="calcPL()"
-              />
+              <label id="pl-buylabel">Harga Beli & Fee Beli (%)</label>
+              <div class="paired-input-container">
+                <input
+                  type="number"
+                  id="pl-buy"
+                  value=""
+                  placeholder="Harga"
+                  oninput="calcPL()"
+                />
+                <input
+                  type="number"
+                  id="pl-feebuy"
+                  value=""
+                  placeholder="Fee %"
+                  step="0.01"
+                  oninput="calcPL()"
+                />
+              </div>
             </div>
+
             <div class="field">
-              <label id="pl-selllabel" for="pl-sell"
-                >Harga jual per lembar (Rp)</label
-              >
-              <input
-                type="number"
-                id="pl-sell"
-                value=""
-                placeholder="Contoh: 6000"
-                oninput="calcPL()"
-              />
-            </div>
-            <div class="field">
-              <label for="pl-feebuy">Fee beli broker (%)</label>
-              <input
-                type="number"
-                id="pl-feebuy"
-                value=""
-                placeholder="Contoh: 0.15"
-                step="0.01"
-                oninput="calcPL()"
-              />
-            </div>
-            <div class="field">
-              <label for="pl-feesell">Fee jual broker (%)</label>
-              <input
-                type="number"
-                id="pl-feesell"
-                value=""
-                placeholder="Contoh: 0.25"
-                step="0.01"
-                oninput="calcPL()"
-              />
+              <label id="pl-selllabel">Harga Jual & Fee Jual (%)</label>
+              <div class="paired-input-container">
+                <input
+                  type="number"
+                  id="pl-sell"
+                  value=""
+                  placeholder="Harga"
+                  oninput="calcPL()"
+                />
+                <input
+                  type="number"
+                  id="pl-feesell"
+                  value=""
+                  placeholder="Fee %"
+                  step="0.01"
+                  oninput="calcPL()"
+                />
+              </div>
             </div>
           </div>
           <div class="hint" id="pl-hint">
@@ -899,31 +910,29 @@
                 oninput="calcBEP()"
               />
             </div>
+
             <div class="field">
-              <label id="bep-buy-label" for="bep-buy"
-                >Harga beli per lembar (Rp)</label
-              >
-              <input
-                type="number"
-                id="bep-buy"
-                value=""
-                placeholder="Contoh: 5000"
-                oninput="calcBEP()"
-              />
+              <label id="bep-buy-label">Harga Beli & Fee Beli (%)</label>
+              <div class="paired-input-container">
+                <input
+                  type="number"
+                  id="bep-buy"
+                  value=""
+                  placeholder="Harga"
+                  oninput="calcBEP()"
+                />
+                <input
+                  type="number"
+                  id="bep-feebuy"
+                  value=""
+                  placeholder="Fee %"
+                  step="0.01"
+                  oninput="calcBEP()"
+                />
+              </div>
             </div>
             <div class="field">
-              <label for="bep-feebuy">Fee beli (%)</label>
-              <input
-                type="number"
-                id="bep-feebuy"
-                value=""
-                placeholder="Contoh: 0.15"
-                step="0.01"
-                oninput="calcBEP()"
-              />
-            </div>
-            <div class="field">
-              <label for="bep-feesell">Fee jual (%)</label>
+              <label>Fee Jual Broker (%)</label>
               <input
                 type="number"
                 id="bep-feesell"
@@ -1044,7 +1053,8 @@
         DATA_AVG: "saham_calc_data_avg",
       };
 
-      // INITIAL LOADING LOCK LOGIC
+      const PLACEHOLDER_HTML = `<div class="result-placeholder"><i class="ti ti-info-circle"></i> Isi semua komponen angka untuk melihat hasil analisis data</div>`;
+
       let isInitialLoading = true;
 
       function openModal() {
@@ -1055,17 +1065,14 @@
         document.getElementById("result-modal").classList.remove("active");
       }
 
-      // PERBAIKAN TOTAL INTERAKSI: TOMBOL HANYA MUNCUL JIKA KONDISI KOLOM TERISI PENUH
       function handlePopupDisplay(contentHtml, isValidData) {
         const floatingBtn = document.getElementById("floating-trigger");
         if (isValidData) {
           document.getElementById("modal-grid-content").innerHTML = contentHtml;
-          floatingBtn.style.display =
-            "inline-flex"; /* Tampilkan tombol mengambang pasif */
+          floatingBtn.style.display = "inline-flex";
         } else {
           document.getElementById("modal-grid-content").innerHTML = "";
-          floatingBtn.style.display =
-            "none"; /* Sembunyikan tombol mengambang jika ada kolom kosong */
+          floatingBtn.style.display = "none";
           closeModal();
         }
       }
@@ -1192,11 +1199,11 @@
           ? "Jumlah lot beli"
           : "Jumlah share beli";
         document.getElementById("pl-buylabel").textContent = isIDX
-          ? "Harga beli per lembar (Rp)"
-          : "Harga beli per share ($)";
+          ? "Harga Beli & Fee Beli (%)"
+          : "Harga Beli & Fee Beli (%)";
         document.getElementById("pl-selllabel").textContent = isIDX
-          ? "Harga jual per lembar (Rp)"
-          : "Harga jual per share ($)";
+          ? "Harga Jual & Fee Jual (%)"
+          : "Harga Jual & Fee Jual (%)";
         document.getElementById("pl-hint").textContent = isIDX
           ? "IDX: PPh final 0.1% sudah termasuk dalam perhitungan biaya jual."
           : "US: tidak ada PPh final per transaksi, pajak capital gain ditanggung investor.";
@@ -1315,8 +1322,8 @@
           ? "Jumlah lot beli"
           : "Jumlah share beli";
         document.getElementById("bep-buy-label").textContent = isIDX
-          ? "Harga beli per lembar (Rp)"
-          : "Harga beli per share ($)";
+          ? "Harga Beli & Fee Beli (%)"
+          : "Harga Beli & Fee Beli (%)";
 
         saveFormFields(STORAGE_KEYS.DATA_BEP, [
           "bep-market",
